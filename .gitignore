@@ -53,3 +53,4 @@ gradlew.bat
 build.number
 build/
 run/
+/bin/
