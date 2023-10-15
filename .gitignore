@@ -54,3 +54,11 @@ build.number
 build/
 run/
 /bin/
+
+.vscode/
+.classpath
+.project
+flymod-forge/.classpath
+flymod-forge/.project
+flymod-forge/.settings
+
