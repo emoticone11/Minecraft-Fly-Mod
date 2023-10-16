@@ -14,31 +14,59 @@
 
 package at.pcgf.flymod;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import org.lwjgl.glfw.GLFW;
+import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.network.NetworkConstants;
+
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+// import org.lwjgl.glfw.GLFW;
 
 import static at.pcgf.flymod.FlyingState.*;
 
-public class FlyModImpl implements ClientModInitializer {
-    public static FlyingState flyingState = NOT_FLYING;
-    public static final String MOD_ID = "flymod";
-    private static final KeyBinding flyKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            "key.flymod.toggle",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_B,
-            "key.flymod.keybinding"
-    ));
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-    @Override
-    public void onInitializeClient() {
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if(flyKey.wasPressed()) {
-                flyingState = flyingState == FLYING ? NEUTRAL : FLYING;
-            }
-        });
+
+@Mod(FlyModImpl.MOD_ID)
+public class FlyModImpl {
+    public static final Logger LOGGER = LogManager.getLogger();
+    public static final String MOD_ID = "flymod";
+
+    public static FlyingState flyingState = NOT_FLYING;
+    private static final KeyMapping flyKey = new KeyMapping(
+        "key.flymod.toggle",
+        InputConstants.Type.KEYSYM,
+        InputConstants.KEY_B,
+        // GLFW.GLFW_KEY_B,
+        "key.flymod.keybinding"
+    );
+
+    public FlyModImpl() {
+        final ModLoadingContext modLoadingContext = ModLoadingContext.get();
+		final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        //Make sure the mod being absent on the other network side does not cause the client to display the server as incompatible
+        modLoadingContext.registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+
+        modEventBus.addListener(this::setup);
+        MinecraftForge.EVENT_BUS.addListener(this::clientTickHandler);
+    }
+
+    private void setup(final FMLCommonSetupEvent event) {
+        ClientRegistry.registerKeyBinding(flyKey);
+    }
+
+    private void clientTickHandler(ClientTickEvent event) {
+        if (flyKey.consumeClick()) {
+            flyingState = flyingState == FLYING ? NEUTRAL : FLYING;
+        }
     }
 }
