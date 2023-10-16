@@ -1,15 +1,32 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
+apply plugin: 'org.spongepowered.mixin'
+// apply plugin: 'eclipse'
+apply plugin: 'java-library'
 apply plugin: 'maven-publish'
+
+
+mixin {
+    add sourceSets.main, "flymod.refmap.json"
+
+    config "flymod.mixins.json"
+}
+
+
+repositories {
+    maven { url "https://maven.shedaniel.me/" }
+}
+
 
 version = modVersion
 group = modGroup
@@ -117,6 +134,10 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.18.2-40.2.10'
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    api(fg.deobf("me.shedaniel.cloth:cloth-config-forge:6.3.81"))
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"

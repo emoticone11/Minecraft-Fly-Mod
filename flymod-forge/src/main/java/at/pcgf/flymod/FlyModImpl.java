@@ -1,63 +1,44 @@
+/*
+ * Copyright (C) 2017 MarkusWME RatzzFatzz
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package at.pcgf.flymod;
 
-import net.java.games.input.Keyboard;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import org.lwjgl.glfw.GLFW;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Map;
+import static at.pcgf.flymod.FlyingState.*;
 
-@Mod("flymod")
-public class FlyModImpl {
-    private static Field keybindings = null;
+public class FlyModImpl implements ClientModInitializer {
+    public static FlyingState flyingState = NOT_FLYING;
+    public static final String MOD_ID = "flymod";
+    private static final KeyBinding flyKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.flymod.toggle",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_B,
+            "key.flymod.keybinding"
+    ));
 
-    public FlyModImpl() {
-    }
-
-    @SubscribeEvent
-    public void onTick(final TickEvent.ClientTickEvent event) throws NoSuchFieldException {
-        if(keybindings == null) {
-            keybindings = KeyBinding.class.getDeclaredField("ALL");
-            keybindings.setAccessible(true);
-        }
-    }
-
-    @SubscribeEvent
-    public void move(final TickEvent.PlayerTickEvent event) throws IllegalAccessException {
-        isSpacePressed();
-        Vector3d deltaVec = event.player.getDeltaMovement();
-//        Vector3d vec = MovementManipulator.multiplyMovement(deltaVec);
-        Vector3d vec = verticalMovement(deltaVec);
-//        event.player.setShiftKeyDown(false);
-//        event.player.setSprinting(false);
-//        event.player.swinging = false;
-        event.player.abilities.flying = true;
-//        event.player.sendMessage(new TranslationTextComponent(vec.toString()), null);
-        event.player.setDeltaMovement(vec);
-    }
-
-    public static Vector3d verticalMovement(Vector3d vector) throws IllegalAccessException {
-        double y = vector.y();
-        double flyUpDownBlocks = 2;
-        if (isSpacePressed()) {
-            y += flyUpDownBlocks;
-        }
-        return new Vector3d(vector.x, y, vector.z);
-    }
-
-    static boolean isSpacePressed() throws IllegalAccessException {
-        if (keybindings == null) {
-            return false;
-        }
-        Map<String, KeyBinding> bindings = (Map<String, KeyBinding>) keybindings.get(null);
-        return bindings.get("key.jump").isDown();
+    @Override
+    public void onInitializeClient() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if(flyKey.wasPressed()) {
+                flyingState = flyingState == FLYING ? NEUTRAL : FLYING;
+            }
+        });
     }
 }
