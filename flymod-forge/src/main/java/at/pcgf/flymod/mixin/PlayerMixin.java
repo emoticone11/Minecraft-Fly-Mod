@@ -100,8 +100,8 @@ public abstract class PlayerMixin extends Player {
 
     private Vec3 mouseControlMovement(Vec3 vec3d, boolean backwards, boolean forwards, boolean left, boolean right) {
         if (FlyModConfigManager.getConfig().mouseControl) {
-            float pitch = yRotO;
-            float yaw = xRotO;
+            float pitch = xRotO;
+            float yaw = yRotO;
             Vector4f directionsVector = new Vector4f(
                     (backwards ? 1 : 0) - (forwards ? 1 : 0),
                     0,
