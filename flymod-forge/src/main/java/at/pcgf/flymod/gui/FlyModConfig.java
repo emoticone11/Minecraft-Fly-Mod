@@ -26,7 +26,7 @@ import java.io.ObjectInputFilter;
 public class FlyModConfig {
 
     @Expose
-    public boolean mouseControl = true;
+    public boolean mouseControl = false;
 
     @Expose
     public boolean onlyForCreative = false;
@@ -53,7 +53,7 @@ public class FlyModConfig {
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(ConfigTexts.TITLE);
         FlyModConfig config = FlyModConfigManager.getConfig();
         builder.getOrCreateCategory(ConfigTexts.CATEGORY)
-                .addEntry(ConfigEntryBuilder.create().startBooleanToggle(ConfigTexts.MOUSE_CONTROL, config.mouseControl).setDefaultValue(true).setSaveConsumer(b -> config.mouseControl = b).build())
+                .addEntry(ConfigEntryBuilder.create().startBooleanToggle(ConfigTexts.MOUSE_CONTROL, config.mouseControl).setDefaultValue(false).setSaveConsumer(b -> config.mouseControl = b).build())
                 .addEntry(ConfigEntryBuilder.create().startFloatField(ConfigTexts.FLY_UP_DOWN_BLOCKS, config.flyUpDownBlocks).setDefaultValue(0.4f).setSaveConsumer(b -> config.flyUpDownBlocks = b).build())
                 .addEntry(ConfigEntryBuilder.create().startFloatField(ConfigTexts.FLY_SPEED_MULTIPLIER, config.flySpeedMultiplier).setDefaultValue(2f).setSaveConsumer(b -> config.flySpeedMultiplier = b).build())
                 .addEntry(ConfigEntryBuilder.create().startFloatField(ConfigTexts.RUN_SPEED_MULTIPLIER, config.runSpeedMultiplier).setDefaultValue(1.3f).setSaveConsumer(b -> config.runSpeedMultiplier = b).build())

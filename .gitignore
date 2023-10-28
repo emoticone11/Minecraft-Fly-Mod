@@ -61,4 +61,6 @@ run/
 flymod-forge/.classpath
 flymod-forge/.project
 flymod-forge/.settings
-
+flymod-forge/bin
+.settings/*
+.project

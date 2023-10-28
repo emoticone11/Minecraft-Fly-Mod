@@ -11,13 +11,13 @@ This Mod for Minecraft allows you to enable a 3D fly and let you customize the f
 
 ## How to use
 
-Press the "B" key to toggle fly mode (configurable in Controls). By default, if you hold the forward key, you will fly towards wherever your mouse is pointing. This can be disabled to instead use normal flying controls by setting `mouse_control` to false (see below). Use the sprint key to boost fly speed.
+Press the "B" key to toggle fly mode (configurable in Controls). By default, flight will use the normal arrow key controls. By enabling `mouse_control` in the mod config file (see below), you can instead fly towards wherever your mouse is pointing when holding the forward key. Use the sprint key to boost fly speed.
 
 The following configuration options are available in `config/flymod.json` in the minecraft instance files:
 
 ```json
 {
-  "mouse_control": true,
+  "mouse_control": false,
   "only_for_creative": false,
   "fly_up_down_blocks": 0.4,
   "fly_speed_multiplier": 3.0,
